@@ -15,6 +15,12 @@ interface ApiService {
     @POST("telephones")
     fun createTelephone(@Body telephone: DataModel.Telephone): Call<DataModel.Telephone>
 
+    @POST("emotional_experiences")
+    fun postEmotionalExperience(
+        @Body experience: DataModel.EmotionalExperience
+    ): Call<DataModel.EmotionalExperience>
+
+
 }
 
 

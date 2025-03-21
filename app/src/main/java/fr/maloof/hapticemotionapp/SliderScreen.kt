@@ -6,28 +6,41 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
-
-
-
-
+import androidx.core.view.HapticFeedbackConstantsCompat
+import androidx.navigation.NavController
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @Composable
 fun SliderScreen(
-    onValidate: () -> Unit = {},
+    navController: NavController,
     onValidateTest: () -> Unit = {},
-    onVibrationTest: () -> Unit = {}
+    onVibrationTest: () -> Unit = {},
+    userId: Int,
+    telephoneId: Int
 ) {
     val context = LocalContext.current
     val vibrationManager = remember { VibrationManager(context) }
 
+    var slider1 by remember { mutableStateOf(0.5f) }
+    var slider2 by remember { mutableStateOf(0.5f) }
+    var slider3 by remember { mutableStateOf(0.5f) }
+    val mobile = 0
+    var vibrationClickCount by remember { mutableStateOf(0) }
+    val maxClicks = 10
 
 
-    var slider1 by remember { mutableStateOf(0.5f) } // Failure–Success
-    var slider2 by remember { mutableStateOf(0.5f) } // Warning–Confirmation
-    var slider3 by remember { mutableStateOf(0.5f) } // Selection–Navigation
+    var selectedVibrationType by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(Unit) {
+        vibrationManager.playNextVibration()
+        selectedVibrationType = vibrationManager.currentVibrationId
+    }
+
 
     Column(
         modifier = Modifier
@@ -40,13 +53,17 @@ fun SliderScreen(
 
         Button(
             onClick = {
-                vibrationManager.playNextVibration()
+                if (vibrationClickCount < maxClicks) {
+                    vibrationManager.replayCurrentVibration()
+                    vibrationClickCount++
+                    Log.d("SliderScreen", "Vibration rejouée : $vibrationClickCount fois")
+                }
             },
+            enabled = vibrationClickCount < maxClicks,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Vibration")
+            Text("Vibration (${vibrationClickCount}/$maxClicks)")
         }
-
 
 
 
@@ -77,9 +94,15 @@ fun SliderScreen(
         Button(
             onClick = {
                 val scenario = determineScenario(slider1, slider2, slider3)
-                Log.d("SliderScreen", "Slider1: $slider1, Slider2: $slider2, Slider3: $slider3")
-                Log.d("SliderScreen", "🎯 Scénario déterminé : $scenario")
-                onValidate() // Tu pourras plus tard transmettre ce scénario en paramètre si besoin
+
+                Log.d("SliderScreen", "Sliders ➜ 1:$slider1 | 2:$slider2 | 3:$slider3")
+                Log.d("SliderScreen", "🎯 Scenario déterminé : $scenario")
+                Log.d("SliderScreen", "📦 VibrationId à transmettre : $selectedVibrationType")
+                val route = "scenario/$userId/$telephoneId/$selectedVibrationType/$slider1/$slider2/$slider3/$scenario/$mobile/$vibrationClickCount"
+                Log.d("SliderScreen", "➡ Route de navigation : $route")
+                navController.navigate(route)
+
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,10 +110,12 @@ fun SliderScreen(
         ) {
             Text("Valider")
         }
+
     }
 }
 
-// Fonction pour déterminer le scénario à partir des 3 sliders
+
+// ✅ En dehors du composable
 fun determineScenario(slider1: Float, slider2: Float, slider3: Float): String {
     val isSuccess = slider1 >= 0.5f
     val isConfirmation = slider2 >= 0.5f
@@ -108,3 +133,29 @@ fun determineScenario(slider1: Float, slider2: Float, slider3: Float): String {
         else -> "Scenario_Inconnu"
     }
 }
+
+/*fun getVibrationNameFromType(vibrationType: Int): String {
+    return when (vibrationType) {
+        HapticFeedbackConstantsCompat.KEYBOARD_RELEASE -> "Keyboard Release"
+        HapticFeedbackConstantsCompat.VIRTUAL_KEY_RELEASE -> "Virtual Key Release"
+        HapticFeedbackConstantsCompat.CLOCK_TICK -> "Clock Tick"
+        HapticFeedbackConstantsCompat.TEXT_HANDLE_MOVE -> "Text Handle Move"
+        HapticFeedbackConstantsCompat.GESTURE_END -> "Gesture End"
+        HapticFeedbackConstantsCompat.VIRTUAL_KEY -> "Virtual Key"
+        HapticFeedbackConstantsCompat.KEYBOARD_PRESS -> "Keyboard Press"
+        HapticFeedbackConstantsCompat.DRAG_START -> "Drag Start"
+        HapticFeedbackConstantsCompat.CONTEXT_CLICK -> "Context Click"
+        HapticFeedbackConstantsCompat.GESTURE_START -> "Gesture Start"
+        HapticFeedbackConstantsCompat.CONFIRM -> "Confirm"
+        HapticFeedbackConstantsCompat.LONG_PRESS -> "Long Press"
+        HapticFeedbackConstantsCompat.REJECT -> "Reject"
+        HapticFeedbackConstantsCompat.TOGGLE_ON -> "Toggle On"
+        HapticFeedbackConstantsCompat.TOGGLE_OFF -> "Toggle Off"
+        HapticFeedbackConstantsCompat.GESTURE_THRESHOLD_ACTIVATE -> "Gesture Threshold Activate"
+        HapticFeedbackConstantsCompat.GESTURE_THRESHOLD_DEACTIVATE -> "Gesture Threshold Deactivate"
+        HapticFeedbackConstantsCompat.KEYBOARD_TAP -> "Keyboard Tap"
+        HapticFeedbackConstantsCompat.SEGMENT_TICK -> "Segment Tick"
+        HapticFeedbackConstantsCompat.SEGMENT_FREQUENT_TICK -> "Segment Frequent Tick"
+        else -> "Vibration inconnue"
+    }
+}*/

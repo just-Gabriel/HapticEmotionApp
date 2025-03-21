@@ -15,25 +15,26 @@ import fr.maloof.hapticemotionapp.DataModel.User
 import fr.maloof.hapticemotionapp.DataModel.Telephone
 
 @Composable
-fun FormulaireScreen(onFormSubmit: (User, Telephone) -> Unit) {
+fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
+
 
     // Champs utilisateur
-    var age by remember { mutableStateOf("") }
-    var sexe by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("25") }
+    var sexe by remember { mutableStateOf("Homme") }
     var mainDominante by remember { mutableStateOf("Droite") }
-    var superviseur by remember { mutableStateOf("") }
-    var paysResidence by remember { mutableStateOf("") }
-    var profession by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("Nicolas Houloux") }
+    var paysResidence by remember { mutableStateOf("France") }
+    var profession by remember { mutableStateOf("Développeur") }
     var isVibrationTelActive by remember { mutableStateOf(false) }
     var isVibrationClavierActive by remember { mutableStateOf(false) }
     var isCoqueTelActive by remember { mutableStateOf(false) }
-    var niveauInformatique by remember { mutableStateOf(0f) }
+    var niveauInformatique by remember { mutableStateOf(2f) }
 
     // Champs téléphone
-    var phoneBrand by remember { mutableStateOf("") }
-    var phoneModel by remember { mutableStateOf("") }
-    var phoneVersion by remember { mutableStateOf("") }
-    var phoneModelNumber by remember { mutableStateOf("") }
+    var phoneBrand by remember { mutableStateOf("Android") }
+    var phoneModel by remember { mutableStateOf("Samsung s22") }
+    var phoneVersion by remember { mutableStateOf(" 13") }
+    var phoneModelNumber by remember { mutableStateOf("SM-S901B") }
 
     val scrollState = rememberScrollState()
 
@@ -52,7 +53,7 @@ fun FormulaireScreen(onFormSubmit: (User, Telephone) -> Unit) {
 
         OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Âge") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = sexe, onValueChange = { sexe = it }, label = { Text("Genre") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = superviseur, onValueChange = { superviseur = it }, label = { Text("Nom du superviseur") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Nom du superviseur") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = paysResidence, onValueChange = { paysResidence = it }, label = { Text("Pays de résidence") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = profession, onValueChange = { profession = it }, label = { Text("Profession") }, modifier = Modifier.fillMaxWidth())
 
@@ -109,7 +110,7 @@ fun FormulaireScreen(onFormSubmit: (User, Telephone) -> Unit) {
                     age = age.toIntOrNull() ?: 0,
                     sexe = sexe,
                     mainDominante = mainDominante,
-                    superviseur = superviseur,
+                    password = password,
                     paysResidence = paysResidence,
                     profession = profession,
                     vibrationTelActive = isVibrationTelActive,
@@ -129,21 +130,31 @@ fun FormulaireScreen(onFormSubmit: (User, Telephone) -> Unit) {
                 RetrofitInstance.api.createUser(user).enqueue(object : retrofit2.Callback<DataModel.User> {
                     override fun onResponse(call: retrofit2.Call<DataModel.User>, response: retrofit2.Response<DataModel.User>) {
                         if (response.isSuccessful) {
-                            Log.d("RETROFIT", "✅ Utilisateur envoyé avec succès")
-                            RetrofitInstance.api.createTelephone(telephone).enqueue(object : retrofit2.Callback<DataModel.Telephone> {
-                                override fun onResponse(call: retrofit2.Call<DataModel.Telephone>, response: retrofit2.Response<DataModel.Telephone>) {
-                                    if (response.isSuccessful) {
-                                        Log.d("RETROFIT", "✅ Téléphone envoyé avec succès")
-                                        onFormSubmit(user, telephone)
-                                    } else {
-                                        Log.e("RETROFIT", "❌ Erreur Téléphone : ${response.code()}")
-                                    }
-                                }
+                            val savedUser = response.body()
+                            if (savedUser != null) {
+                                Log.d("RETROFIT", "✅ Utilisateur envoyé avec succès - ID : ${savedUser.id}")
 
-                                override fun onFailure(call: retrofit2.Call<DataModel.Telephone>, t: Throwable) {
-                                    Log.e("RETROFIT", "❌ Envoi téléphone échoué : ${t.message}")
-                                }
-                            })
+                                RetrofitInstance.api.createTelephone(telephone).enqueue(object : retrofit2.Callback<DataModel.Telephone> {
+                                    override fun onResponse(call: retrofit2.Call<DataModel.Telephone>, response: retrofit2.Response<DataModel.Telephone>) {
+                                        if (response.isSuccessful) {
+                                            val savedPhone = response.body()
+                                            if (savedPhone != null) {
+                                                Log.d("RETROFIT", "✅ Téléphone envoyé avec succès - ID : ${savedPhone.id}")
+
+                                                // 👉 ENVOI DES ID UNIQUEMENT à SliderScreen
+                                                onFormSubmit(savedUser.id ?: 0, savedPhone.id ?: 0)
+                                            }
+                                        } else {
+                                            Log.e("RETROFIT", "❌ Erreur Téléphone : ${response.code()}")
+                                        }
+                                    }
+
+                                    override fun onFailure(call: retrofit2.Call<DataModel.Telephone>, t: Throwable) {
+                                        Log.e("RETROFIT", "❌ Envoi téléphone échoué : ${t.message}")
+                                    }
+                                })
+
+                            }
                         } else {
                             Log.e("RETROFIT", "❌ Erreur Utilisateur : ${response.code()}")
                         }
@@ -153,6 +164,7 @@ fun FormulaireScreen(onFormSubmit: (User, Telephone) -> Unit) {
                         Log.e("RETROFIT", "❌ Envoi utilisateur échoué : ${t.message}")
                     }
                 })
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {

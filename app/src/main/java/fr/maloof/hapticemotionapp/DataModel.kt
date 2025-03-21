@@ -12,7 +12,7 @@ class DataModel {
         val age: Int,
         val sexe: String,
         val mainDominante: String,
-        val superviseur: String?,
+        val password: String?,
         val paysResidence: String,
         val profession: String,
         val vibrationTelActive: Boolean,
@@ -32,6 +32,28 @@ class DataModel {
         //val experiences: List<Experience> = emptyList(),
         //val vibrations: List<Vibration> = emptyList()
     ) : Parcelable
+
+
+    data class EmotionalExperience(
+        val user: String,
+        val telephone: String,
+        val vibrationId: Int?,
+        val slider1FS: Float?,
+        val slider2WC: Float?,
+        val slider3SN: Float?,
+        val nbDeFois: Int?,
+        val scenario: String?,
+        val evaluation: String?,
+        val mobile: Int?
+    )
+
+    @Parcelize
+    data class VibrationEntry(
+        val id: Int,
+        val action: () -> Unit)
+        : Parcelable
+
+
 
 }
 
