@@ -87,12 +87,33 @@ fun ScenarioScreen(
                 .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val context = LocalContext.current
             when (scenarioName) {
                 "Scenario_1_Failure_Warning_Selection" -> Scenario1UI(
-                    vibrationManager = vibrationManager,
-                    vibrationType = vibrationId
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId, // ✅ vibrationId transmis ici
+                    userId = userId,
+                    telephoneId = telephoneId,
+                    slider1 = slider1,
+                    slider2 = slider2,
+                    slider3 = slider3,
+                    mobile = mobile,
+                    vibrationClickCount = vibrationClickCount
                 )
-                "Scenario_2_Failure_Warning_Navigation" -> Scenario2UI()
+
+                "Scenario_2_Failure_Warning_Navigation" -> Scenario2UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                    userId = userId,
+                    telephoneId = telephoneId,
+                    slider1 = slider1,
+                    slider2 = slider2,
+                    slider3 = slider3,
+                    mobile = mobile,
+                    vibrationClickCount = vibrationClickCount,
+
+
+                )
                 "Scenario_3_Failure_Confirmation_Selection" -> Scenario3UI()
                 "Scenario_4_Failure_Confirmation_Navigation" -> Scenario4UI()
                 "Scenario_5_Success_Warning_Selection" -> Scenario5UI()
@@ -108,7 +129,7 @@ fun ScenarioScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Êtes-vous satisfait de votre choix ?", fontSize = 18.sp)
+            Text("Vibration adaptée au scénario ?", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)

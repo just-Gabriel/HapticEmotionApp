@@ -56,7 +56,7 @@ fun SliderScreen(
                 if (vibrationClickCount < maxClicks) {
                     vibrationManager.replayCurrentVibration()
                     vibrationClickCount++
-                    Log.d("SliderScreen", "Vibration rejouée : $vibrationClickCount fois")
+                    Log.d("SliderScreen", "📢 Vibration rejouée : type=$selectedVibrationType, nb=$vibrationClickCount")
                 }
             },
             enabled = vibrationClickCount < maxClicks,

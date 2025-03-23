@@ -38,9 +38,9 @@ class VibrationManager(private val context: Context) {
             3 to { clockTickFeedback() },
             4 to { textHandleMoveFeedback() },
             5 to { gestureEndFeedback() },
-            6 to { virtualKeyFeedback() },
-            7 to { keyboardPressFeedback() },
-            8 to { dragStartFeedback() },
+            6 to { keyboardPressFeedback() },
+            7 to { virtualKeyFeedback() },
+            8 to { keyboardTapFeedback() },
             9 to { contextClickFeedback() },
             10 to { gestureStartFeedback() },
             11 to { confirmFeedback() },
@@ -50,7 +50,7 @@ class VibrationManager(private val context: Context) {
             15 to { toggleOffFeedback() },
             16 to { gestureThresholdActivateFeedback() },
             17 to { gestureThresholdDeactivateFeedback() },
-            18 to { keyboardTapFeedback() },
+            18 to { dragStartFeedback() },
             19 to { segmentTickFeedback() },
             20 to { segmentFrequentTickFeedback() }
         ).shuffled()
@@ -80,12 +80,35 @@ class VibrationManager(private val context: Context) {
 
     // Si jamais tu appelles une vibration manuelle par type
     fun vibrateByType(type: Int) {
-        vibrateOneShot(
-            when (type) {
-                else -> 100L // Valeur par défaut
-            }
-        )
+        Log.d("VibrationManager", "🎯 vibrateByType($type)")
+        when (type) {
+            1 -> keyboardReleaseFeedback()
+            2 -> virtualKeyReleaseFeedback()
+            3 -> clockTickFeedback()
+            4 -> textHandleMoveFeedback()
+            5 -> gestureEndFeedback()
+            6 -> keyboardPressFeedback()
+            7 -> virtualKeyFeedback()
+            8 -> keyboardTapFeedback()
+            9 -> contextClickFeedback()
+            10 -> gestureStartFeedback()
+            11 -> confirmFeedback()
+            12 -> longPressFeedback()
+            13 -> rejectFeedback()
+            14 -> toggleOnFeedback()
+            15 -> toggleOffFeedback()
+            16 -> gestureThresholdActivateFeedback()
+            17 -> gestureThresholdDeactivateFeedback()
+            18 -> dragStartFeedback()
+            19 -> segmentTickFeedback()
+            20 -> segmentFrequentTickFeedback()
+            else -> defaultFeedback()
+        }
     }
+    fun defaultFeedback() {
+        vibrateOneShot(100)
+    }
+
 
     // === Méthodes de base ===
     fun vibratePattern(pattern: LongArray) {
