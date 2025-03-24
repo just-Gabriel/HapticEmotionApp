@@ -6,8 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +20,7 @@ import fr.maloof.hapticemotionapp.R
 import fr.maloof.hapticemotionapp.VibrationManager
 
 @Composable
-fun SamsungClockPicker(
+fun SamsungClockPickerSansAlerte(
     selectedHour: Int,
     selectedMinute: Int,
     onHourChange: (Int) -> Unit,
@@ -31,7 +29,6 @@ fun SamsungClockPicker(
     vibrationType: Int
 ) {
     val context = LocalContext.current
-    var showAlert by remember { mutableStateOf(false) }
     var vibrationPlayed by remember { mutableStateOf(false) }
 
     Column(
@@ -63,7 +60,7 @@ fun SamsungClockPicker(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ✅ Bouton pour choisir l'heure via TimePicker
+        // ✅ Bouton pour ouvrir le TimePicker
         Button(onClick = {
             TimePickerDialog(
                 context,
@@ -73,7 +70,7 @@ fun SamsungClockPicker(
                 },
                 selectedHour,
                 selectedMinute,
-                true // is24HourView = true
+                true
             ).show()
         }) {
             Text("Choisir une heure")
@@ -81,43 +78,15 @@ fun SamsungClockPicker(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ✅ Bouton Enregistrer
+        // ✅ Bouton Enregistrer sans alerte
         Button(onClick = {
-            showAlert = true
             if (!vibrationPlayed) {
                 vibrationManager.vibrateByType(vibrationType)
                 vibrationPlayed = true
-                Log.d("SamsungClockPicker", "✅ Vibration lancée : type=$vibrationType")
+                Log.d("SamsungClockPickerSansAlerte", "✅ Vibration lancée : type=$vibrationType")
             }
         }) {
             Text("Enregistrer")
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 🚨 Alerte affichée après clic
-        // 🚨 Alerte sous forme de popup
-        if (showAlert) {
-            AlertDialog(
-                onDismissRequest = {
-                    showAlert = false
-                },
-                confirmButton = {
-                    TextButton(onClick = { showAlert = false }) {
-                        Text("OK")
-                    }
-                },
-                icon = {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                },
-                title = {
-                    Text("Attention", color = MaterialTheme.colorScheme.error)
-                },
-                text = {
-                    Text("Heure déjà occupée par un mode \"Ne pas déranger\"")
-                }
-            )
-        }
-
     }
 }

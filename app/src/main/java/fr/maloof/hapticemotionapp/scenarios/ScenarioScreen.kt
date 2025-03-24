@@ -91,35 +91,36 @@ fun ScenarioScreen(
             when (scenarioName) {
                 "Scenario_1_Failure_Warning_Selection" -> Scenario1UI(
                     vibrationManager = VibrationManager(context),
-                    vibrationType = vibrationId, // ✅ vibrationId transmis ici
-                    userId = userId,
-                    telephoneId = telephoneId,
-                    slider1 = slider1,
-                    slider2 = slider2,
-                    slider3 = slider3,
-                    mobile = mobile,
-                    vibrationClickCount = vibrationClickCount
+                    vibrationType = vibrationId,
                 )
-
                 "Scenario_2_Failure_Warning_Navigation" -> Scenario2UI(
                     vibrationManager = VibrationManager(context),
                     vibrationType = vibrationId,
-                    userId = userId,
-                    telephoneId = telephoneId,
-                    slider1 = slider1,
-                    slider2 = slider2,
-                    slider3 = slider3,
-                    mobile = mobile,
-                    vibrationClickCount = vibrationClickCount,
-
-
                 )
-                "Scenario_3_Failure_Confirmation_Selection" -> Scenario3UI()
-                "Scenario_4_Failure_Confirmation_Navigation" -> Scenario4UI()
-                "Scenario_5_Success_Warning_Selection" -> Scenario5UI()
-                "Scenario_6_Success_Warning_Navigation" -> Scenario6UI()
-                "Scenario_7_Success_Confirmation_Selection" -> Scenario7UI()
-                "Scenario_8_Success_Confirmation_Navigation" -> Scenario8UI()
+                "Scenario_3_Failure_Confirmation_Selection" -> Scenario3UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
+                "Scenario_4_Failure_Confirmation_Navigation" -> Scenario4UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
+                "Scenario_5_Success_Warning_Selection" -> Scenario5UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
+                "Scenario_6_Success_Warning_Navigation" -> Scenario6UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
+                "Scenario_7_Success_Confirmation_Selection" -> Scenario7UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
+                "Scenario_8_Success_Confirmation_Navigation" -> Scenario8UI(
+                    vibrationManager = VibrationManager(context),
+                    vibrationType = vibrationId,
+                )
                 else -> Text("Scénario inconnu", color = MaterialTheme.colorScheme.error)
             }
         }
