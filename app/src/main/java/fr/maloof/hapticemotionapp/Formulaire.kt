@@ -11,8 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import fr.maloof.hapticemotionapp.DataModel.User
-import fr.maloof.hapticemotionapp.DataModel.Telephone
+
 
 @Composable
 fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {

@@ -46,9 +46,6 @@ fun Scenario1UI(
     vibrationType: Int,
 
 ) {
-    var vibrationPlayed by remember { mutableStateOf(false) }
-    var showUnavailableMessage by remember { mutableStateOf(false) }
-
 
     Column(
         modifier = Modifier

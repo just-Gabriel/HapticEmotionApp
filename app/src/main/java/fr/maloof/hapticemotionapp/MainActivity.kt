@@ -24,6 +24,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             HapticEmotionAppTheme {
                 val navController = rememberNavController()
+                val vibrationManager = remember { VibrationManager(applicationContext) }
+
 
                 NavHost(navController = navController, startDestination = "accueil") {
 
@@ -53,7 +55,8 @@ class MainActivity : ComponentActivity() {
                         SliderScreen(
                             navController = navController,
                             userId = userId,
-                            telephoneId = telephoneId
+                            telephoneId = telephoneId,
+                            vibrationManager = vibrationManager
                         )
                     }
 

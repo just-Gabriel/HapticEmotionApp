@@ -128,7 +128,12 @@ class VibrationManager(private val context: Context) {
             vibrator.vibrate(longArrayOf(0, milliseconds), -1)
         }
     }
+    //___________________________________________________________________________________________________________________________________________________________
+    fun getCurrentVibrationList(): List<Int> {
+        return vibrationListWithId.map { it.first }
+    }
 
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     // === Feedback personnalisés (patterns ou durées) ===
     fun keyboardReleaseFeedback() {
         val pattern = longArrayOf(0, 50, 50, 100)

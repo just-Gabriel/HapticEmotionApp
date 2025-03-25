@@ -9,22 +9,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.navigation.NavController
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
 
 @Composable
 fun SliderScreen(
     navController: NavController,
-    onValidateTest: () -> Unit = {},
-    onVibrationTest: () -> Unit = {},
+    //onValidateTest: () -> Unit = {},
+    //onVibrationTest: () -> Unit = {},
     userId: Int,
-    telephoneId: Int
+    telephoneId: Int,
+    vibrationManager: VibrationManager
 ) {
     val context = LocalContext.current
-    val vibrationManager = remember { VibrationManager(context) }
+    //val vibrationManager = remember { VibrationManager(context) }
 
     var slider1 by remember { mutableStateOf(0.5f) }
     var slider2 by remember { mutableStateOf(0.5f) }
@@ -36,6 +34,16 @@ fun SliderScreen(
 
     var selectedVibrationType by remember { mutableStateOf<Int?>(null) }
 
+    LaunchedEffect(Unit) {
+        val fullList = vibrationManager.getCurrentVibrationList()
+        fullList.forEachIndexed { index, id ->
+            Log.d("VIB_LIST", "[$index] vibrationId = $id")
+        }
+    }
+
+
+
+    //GOOD
     LaunchedEffect(Unit) {
         vibrationManager.playNextVibration()
         selectedVibrationType = vibrationManager.currentVibrationId
