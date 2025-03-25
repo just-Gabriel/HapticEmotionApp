@@ -33,6 +33,9 @@ fun ScenarioScreen(
     navController: NavController
 ) {
     val apiService = RetrofitInstance.api
+    val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
+    val testCounter = savedStateHandle?.get<Int>("testCounter") ?: 1
+    val isTestFinished = testCounter >= 10  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
 
 
 
@@ -68,7 +71,7 @@ fun ScenarioScreen(
         })
     }
 
-    // ✅ UI complète avec footer fixé en bas
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -132,37 +135,46 @@ fun ScenarioScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(onClick = {
+                    Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
                     sendExperienceToApi("yes")
 
-                    // 🔁 Dire à SliderScreen de jouer la prochaine vibration au retour
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("shouldPlayNext", true)
+                    if (isTestFinished) {
+                        navController.navigate("testTermine") {
+                            popUpTo("accueil") { inclusive = false }
+                        }
+                        Log.d("ScenarioScreen", "🟢 Fin des 60 tests, vers TestTermineScreen")
+                    } else {
+                        savedStateHandle?.set("testCounter", testCounter + 1)
+                        savedStateHandle?.set("shouldPlayNext", true)
+                        navController.popBackStack()
+                        Log.d("ScenarioScreen", "Retour SliderScreen ➜ testCounter = ${testCounter + 1}")
+                    }
 
-                    navController.popBackStack()
-                    Log.d("Navigation", "Retour vers SliderScreen via popBackStack")
-                    Log.d("ScenarioScreen", "POST vers API : YES")
-                    Log.d("POST DEBUG", "POST : user=$userId, tel=$telephoneId, vibration=$vibrationId, scenario=$scenarioName")
+                    Log.d("ScenarioScreen", "✅ POST vers API : YES")
                 }) {
                     Text("Oui")
                 }
 
                 Button(onClick = {
+                    Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
                     sendExperienceToApi("no")
 
-                    // 🔁 Dire à SliderScreen de jouer la prochaine vibration au retour
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set("shouldPlayNext", true)
+                    if (isTestFinished) {
+                        navController.navigate("testTermine") {
+                            popUpTo("accueil") { inclusive = false }
+                        }
+                        Log.d("ScenarioScreen", "🟢 Fin des 60 tests, vers TestTermineScreen")
+                    } else {
+                        savedStateHandle?.set("testCounter", testCounter + 1)
+                        savedStateHandle?.set("shouldPlayNext", true)
+                        navController.popBackStack()
+                        Log.d("ScenarioScreen", "Retour SliderScreen ➜ testCounter = ${testCounter + 1}")
+                    }
 
-                    navController.popBackStack()
-                    Log.d("Navigation", "Retour vers SliderScreen via popBackStack")
-                    Log.d("ScenarioScreen", "POST vers API : NO")
-                    Log.d("POST DEBUG", "POST : user=$userId, tel=$telephoneId, vibration=$vibrationId, scenario=$scenarioName")
+                    Log.d("ScenarioScreen", "✅ POST vers API : NO")
                 }) {
                     Text("Non")
                 }
-
             }
         }
     }

@@ -133,6 +133,11 @@ class VibrationManager(private val context: Context) {
         return vibrationListWithId.map { it.first }
     }
 
+    fun isFinished(): Boolean {
+        return currentIndex >= vibrationListWithId.size
+    }
+
+
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------
     // === Feedback personnalisés (patterns ou durées) ===
     fun keyboardReleaseFeedback() {

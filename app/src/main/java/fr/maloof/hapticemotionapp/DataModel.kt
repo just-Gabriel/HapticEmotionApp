@@ -19,7 +19,6 @@ class DataModel {
         val vibrationClavierActive: Boolean,
         val coqueTel: Boolean,
         val niveauInformatique: Int,
-        //val experiences: List<Experience> = emptyList()
     ) : Parcelable
 
     @Parcelize
@@ -29,8 +28,6 @@ class DataModel {
         val modele: String,
         val versionLogiciel: String,
         val numeroModele: String,
-        //val experiences: List<Experience> = emptyList(),
-        //val vibrations: List<Vibration> = emptyList()
     ) : Parcelable
 
 
@@ -52,9 +49,6 @@ class DataModel {
         val id: Int,
         val action: () -> Unit)
         : Parcelable
-
-
-
 }
 
 

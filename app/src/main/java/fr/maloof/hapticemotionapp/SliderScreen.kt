@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -15,14 +14,10 @@ import androidx.navigation.NavController
 @Composable
 fun SliderScreen(
     navController: NavController,
-    //onValidateTest: () -> Unit = {},
-    //onVibrationTest: () -> Unit = {},
     userId: Int,
     telephoneId: Int,
     vibrationManager: VibrationManager
 ) {
-    val context = LocalContext.current
-    //val vibrationManager = remember { VibrationManager(context) }
 
     var slider1 by remember { mutableStateOf(0.5f) }
     var slider2 by remember { mutableStateOf(0.5f) }
@@ -30,9 +25,12 @@ fun SliderScreen(
     val mobile = 0
     var vibrationClickCount by remember { mutableStateOf(0) }
     val maxClicks = 10
-
-
     var selectedVibrationType by remember { mutableStateOf<Int?>(null) }
+
+
+
+
+
 
     LaunchedEffect(Unit) {
         val fullList = vibrationManager.getCurrentVibrationList()
@@ -41,12 +39,16 @@ fun SliderScreen(
         }
     }
 
-
-
-    //GOOD
     LaunchedEffect(Unit) {
-        vibrationManager.playNextVibration()
-        selectedVibrationType = vibrationManager.currentVibrationId
+        if (vibrationManager.isFinished()) {
+            Log.d("SliderScreen", "🎉 Toutes les vibrations ont été jouées. Fin du test.")
+            navController.navigate("test_termine") {
+                popUpTo("sliders/{userId}/{telephoneId}") { inclusive = true }
+            }
+        } else {
+            vibrationManager.playNextVibration()
+            selectedVibrationType = vibrationManager.currentVibrationId
+        }
     }
 
 
@@ -102,15 +104,8 @@ fun SliderScreen(
         Button(
             onClick = {
                 val scenario = determineScenario(slider1, slider2, slider3)
-
-                Log.d("SliderScreen", "Sliders ➜ 1:$slider1 | 2:$slider2 | 3:$slider3")
-                Log.d("SliderScreen", "🎯 Scenario déterminé : $scenario")
-                Log.d("SliderScreen", "📦 VibrationId à transmettre : $selectedVibrationType")
                 val route = "scenario/$userId/$telephoneId/$selectedVibrationType/$slider1/$slider2/$slider3/$scenario/$mobile/$vibrationClickCount"
-                Log.d("SliderScreen", "➡ Route de navigation : $route")
                 navController.navigate(route)
-
-
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,10 +113,8 @@ fun SliderScreen(
         ) {
             Text("Valider")
         }
-
     }
 }
-
 
 // ✅ En dehors du composable
 fun determineScenario(slider1: Float, slider2: Float, slider3: Float): String {
@@ -142,28 +135,4 @@ fun determineScenario(slider1: Float, slider2: Float, slider3: Float): String {
     }
 }
 
-/*fun getVibrationNameFromType(vibrationType: Int): String {
-    return when (vibrationType) {
-        HapticFeedbackConstantsCompat.KEYBOARD_RELEASE -> "Keyboard Release"
-        HapticFeedbackConstantsCompat.VIRTUAL_KEY_RELEASE -> "Virtual Key Release"
-        HapticFeedbackConstantsCompat.CLOCK_TICK -> "Clock Tick"
-        HapticFeedbackConstantsCompat.TEXT_HANDLE_MOVE -> "Text Handle Move"
-        HapticFeedbackConstantsCompat.GESTURE_END -> "Gesture End"
-        HapticFeedbackConstantsCompat.VIRTUAL_KEY -> "Virtual Key"
-        HapticFeedbackConstantsCompat.KEYBOARD_PRESS -> "Keyboard Press"
-        HapticFeedbackConstantsCompat.DRAG_START -> "Drag Start"
-        HapticFeedbackConstantsCompat.CONTEXT_CLICK -> "Context Click"
-        HapticFeedbackConstantsCompat.GESTURE_START -> "Gesture Start"
-        HapticFeedbackConstantsCompat.CONFIRM -> "Confirm"
-        HapticFeedbackConstantsCompat.LONG_PRESS -> "Long Press"
-        HapticFeedbackConstantsCompat.REJECT -> "Reject"
-        HapticFeedbackConstantsCompat.TOGGLE_ON -> "Toggle On"
-        HapticFeedbackConstantsCompat.TOGGLE_OFF -> "Toggle Off"
-        HapticFeedbackConstantsCompat.GESTURE_THRESHOLD_ACTIVATE -> "Gesture Threshold Activate"
-        HapticFeedbackConstantsCompat.GESTURE_THRESHOLD_DEACTIVATE -> "Gesture Threshold Deactivate"
-        HapticFeedbackConstantsCompat.KEYBOARD_TAP -> "Keyboard Tap"
-        HapticFeedbackConstantsCompat.SEGMENT_TICK -> "Segment Tick"
-        HapticFeedbackConstantsCompat.SEGMENT_FREQUENT_TICK -> "Segment Frequent Tick"
-        else -> "Vibration inconnue"
-    }
-}*/
+
