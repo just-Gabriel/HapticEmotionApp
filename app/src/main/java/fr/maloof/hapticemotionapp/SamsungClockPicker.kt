@@ -63,7 +63,9 @@ fun SamsungClockPicker(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ✅ Bouton pour choisir l'heure via TimePicker
-        Button(onClick = {
+        CustomButton(
+            text ="Choisir une heure",
+            onClick = {
             TimePickerDialog(
                 context,
                 { _, hour: Int, minute: Int ->
@@ -74,23 +76,22 @@ fun SamsungClockPicker(
                 selectedMinute,
                 true // is24HourView = true
             ).show()
-        }) {
-            Text("Choisir une heure")
-        }
+        })
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // ✅ Bouton Enregistrer
-        Button(onClick = {
+        CustomButton(
+                text="Enregistrer",
+                onClick = {
             showAlert = true
             if (!vibrationPlayed) {
                 vibrationManager.vibrateByType(vibrationType)
                 vibrationPlayed = true
                 Log.d("SamsungClockPicker", "✅ Vibration lancée : type=$vibrationType")
             }
-        }) {
-            Text("Enregistrer")
-        }
+        })
+
 
         Spacer(modifier = Modifier.height(16.dp))
 

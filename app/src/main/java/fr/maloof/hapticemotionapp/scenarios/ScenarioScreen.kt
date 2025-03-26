@@ -17,6 +17,7 @@ import fr.maloof.hapticemotionapp.VibrationManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import fr.maloof.hapticemotionapp.components.CustomButton
 
 
 @Composable
@@ -35,7 +36,7 @@ fun ScenarioScreen(
     val apiService = RetrofitInstance.api
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
     val testCounter = savedStateHandle?.get<Int>("testCounter") ?: 1
-    val isTestFinished = testCounter >= 10  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
+    val isTestFinished = testCounter >= 5  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
 
 
 
@@ -134,9 +135,11 @@ fun ScenarioScreen(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Button(onClick = {
+                CustomButton(
+                    text = "Oui",
+                    onClick = {
                     Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
-                    sendExperienceToApi("yes")
+                    sendExperienceToApi("oui")
 
                     if (isTestFinished) {
                         navController.navigate("testTermine") {
@@ -151,13 +154,13 @@ fun ScenarioScreen(
                     }
 
                     Log.d("ScenarioScreen", "✅ POST vers API : YES")
-                }) {
-                    Text("Oui")
-                }
+                })
 
-                Button(onClick = {
+                CustomButton(
+                    text = "Non",
+                    onClick = {
                     Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
-                    sendExperienceToApi("no")
+                    sendExperienceToApi("non")
 
                     if (isTestFinished) {
                         navController.navigate("testTermine") {
@@ -172,9 +175,7 @@ fun ScenarioScreen(
                     }
 
                     Log.d("ScenarioScreen", "✅ POST vers API : NO")
-                }) {
-                    Text("Non")
-                }
+                })
             }
         }
     }

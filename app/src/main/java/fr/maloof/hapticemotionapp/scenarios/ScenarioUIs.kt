@@ -1,8 +1,10 @@
 package fr.maloof.hapticemotionapp.scenarios
 
 
-import android.app.TimePickerDialog
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -30,13 +32,17 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.ThumbUp
-import java.util.*
-import java.util.concurrent.TimeUnit
-import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.graphicsLayer
+import kotlinx.coroutines.delay
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.zIndex
+import fr.maloof.hapticemotionapp.components.CustomButton
+
+
 
 
 
@@ -243,7 +249,7 @@ fun Scenario1UI(
         }}}
 
 
-
+//________________________________________________________________________________________________________________________________________________________________________________
 
 @Composable
 fun Scenario2UI(
@@ -330,7 +336,7 @@ fun Scenario2UI(
     }
 }
 
-
+//_____________________________________________________________________________________________________________________________________________________________________________
 
 
 @Composable
@@ -362,7 +368,7 @@ fun Scenario3UI(
         Icon(
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Utilisateur",
-            tint = MaterialTheme.colorScheme.primary,
+            tint = Color(0xFF029AAF),
             modifier = Modifier
                 .size(96.dp)
                 .padding(bottom = 16.dp)
@@ -390,7 +396,16 @@ fun Scenario3UI(
         Spacer(modifier = Modifier.height(24.dp))
 
         // ✅ Bouton de connexion (qui échoue volontairement ici)
-        Button(
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
+
+        val buttonColor by animateColorAsState(
+            targetValue = if (isPressed) Color(0xFF029AAF) else Color(0xFF029AAF),
+            label = "dynamicRed"
+        )
+
+        CustomButton(
+            text = "Connexion",
             onClick = {
                 showAlert = true
                 if (!vibrationPlayed) {
@@ -399,37 +414,52 @@ fun Scenario3UI(
                     Log.d("Scenario3UI", "📣 Vibration déclenchée (échec connexion)")
                 }
             },
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-        ) {
-            Text("Connexion", color = MaterialTheme.colorScheme.onError)
-        }
+            modifier = Modifier.fillMaxWidth(),
+            backgroundColor = buttonColor, // couleur animée
+            interactionSource = interactionSource // pour détecter le clic ici uniquement
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+
 
         // ✅ Alerte sous forme de popup
         if (showAlert) {
             AlertDialog(
                 onDismissRequest = { showAlert = false },
                 confirmButton = {
-                    TextButton(onClick = { showAlert = false }) {
-                        Text("OK")
-                    }
+                    CustomButton(
+                        text = "Réessayer",
+                        onClick = { showAlert = false },
+                        backgroundColor = Color(0xFF029AAF),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 },
                 icon = {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = Color(0xFFD32F2F),
+                        modifier = Modifier.size(36.dp)
+                    )
                 },
                 title = {
-                    Text("Échec de la connexion")
+                    Text(
+                        "Connexion échouée",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
                 },
                 text = {
-                    Text("Vos identifiants sont incorrects. Veuillez réessayer.")
-                }
+                    Text("Oups... vos identifiants sont incorrects.\nVeuillez réessayer.")
+                },
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp
             )
         }
+
     }
 }
 
-
+//_____________________________________________________________________________________________________________________________________________________________________________
 
 @Composable
 fun Scenario4UI(
@@ -457,18 +487,29 @@ fun Scenario4UI(
         )
 
         // 🔸 Dropdown Menu
-        Box {
-            Button(onClick = { expanded = true }) {
-                Text(selectedLevel)
-            }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            CustomButton(
+                text = selectedLevel.ifEmpty { "Sélectionner un niveau" },
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxWidth()
+            )
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .wrapContentSize(Alignment.TopStart)
+                    .fillMaxWidth()
+                    .zIndex(1f)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    )
             ) {
                 niveaux.forEach { niveau ->
+                    val isSelected = niveau == selectedLevel
+
                     DropdownMenuItem(
-                        text = { Text(niveau) },
                         onClick = {
                             selectedLevel = niveau
                             expanded = false
@@ -478,10 +519,39 @@ fun Scenario4UI(
                                 vibrationPlayed = true
                                 Log.d("Scenario4UI", "📣 Vibration déclenchée sur sélection : $niveau")
                             }
+                        },
+                        text = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = if (isSelected) Color(0xFF029AAF).copy(alpha = 0.1f) else Color.Transparent,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ThumbUp,
+                                    contentDescription = null,
+                                    tint = if (isSelected) Color(0xFF029AAF) else Color.Gray,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = niveau,
+                                    fontSize = 16.sp,
+                                    color = if (isSelected) Color(0xFF029AAF) else Color.Black,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
                         }
                     )
+
+
                 }
             }
+
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -504,7 +574,7 @@ fun Scenario4UI(
         }
     }
 }
-
+//_____________________________________________________________________________________________________________________________________________________________________________
 @Composable
 fun Scenario5UI(
     vibrationManager: VibrationManager,
@@ -577,7 +647,7 @@ fun Scenario5UI(
         }
 }}
 
-
+//_____________________________________________________________________________________________________________________________________________________________________________
 @Composable
 fun Scenario6UI(
     vibrationManager: VibrationManager,
@@ -663,7 +733,7 @@ fun Scenario6UI(
     }
 }
 
-
+//_____________________________________________________________________________________________________________________________________________________________________________
 @Composable
 fun Scenario7UI(
     vibrationManager: VibrationManager,
@@ -680,49 +750,54 @@ fun Scenario7UI(
         verticalArrangement = Arrangement.Top
     ) {
         if (!confirmed) {
-            // 🛍 Titre avant confirmation
             Text(
                 text = "Vous êtes ravis de votre choix,\nl’application vous demande de confirmer votre super achat",
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // 🖼 Article affiché (table)
-            Image(
-                painter = painterResource(id = R.drawable.table), // image "table" à ajouter dans drawable
-                contentDescription = "Achat",
+            // 🖼️ Image dans une Card
+            Card(
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .size(220.dp)
-                    .padding(bottom = 24.dp)
-            )
+                    .padding(12.dp)
+                    .size(250.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.table),
+                    contentDescription = "Achat à confirmer",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
-            // ✅ Bouton confirmer
-            Button(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // ✅ Custom Button Vert
+            CustomButton(
+                text = "CONFIRMER",
+                backgroundColor = Color(0xFF66BB6A),
                 onClick = {
                     confirmed = true
                     if (!vibrationPlayed) {
                         vibrationManager.vibrateByType(vibrationType)
                         vibrationPlayed = true
-                        Log.d("Scenario8UI", "✅ Vibration de confirmation envoyée")
+                        Log.d("Scenario7UI", "✅ Vibration de confirmation envoyée")
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF66BB6A)) // Vert succès
-            ) {
-                Text("CONFIRMER", color = Color.White)
-            }
-
+                modifier = Modifier.fillMaxWidth()
+            )
         } else {
-            // ✅ Confirmation affichée après clic
             Text(
                 text = "Bravo l’achat est confirmé 🎉",
-                fontSize = 20.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // ✅ Icône confirmation / Visuel succès
             Icon(
                 imageVector = Icons.Default.ThumbUp,
                 contentDescription = "Achat validé",
@@ -732,11 +807,21 @@ fun Scenario7UI(
                     .padding(bottom = 16.dp)
             )
 
-            // (optionnel) Tu peux aussi afficher une image de lauriers ici si tu veux un effet visuel plus proche de ta maquette
-            // Image(painter = painterResource(id = R.drawable.lauriers), contentDescription = "Lauriers", modifier = Modifier.size(120.dp))
+            // 🌿 Bonus : visuel type laurier ou trophée ?
+            // Image(painter = painterResource(id = R.drawable.lauriers), contentDescription = "Success", modifier = Modifier.size(120.dp))
         }
     }
 }
+
+
+enum class ActivationState {
+    Idle, Loading, Success
+}
+
+
+
+//_____________________________________________________________________________________________________________________________________________________________________________
+
 
 
 @Composable
@@ -744,123 +829,119 @@ fun Scenario8UI(
     vibrationManager: VibrationManager,
     vibrationType: Int
 ) {
-    val context = LocalContext.current
-    var selectedHour by remember { mutableStateOf(7) }
-    var selectedMinute by remember { mutableStateOf(30) }
-    var messageAlarme by remember { mutableStateOf("") }
-    var vibrationPlayed by remember { mutableStateOf(false) }
+    var activationState by remember { mutableStateOf(ActivationState.Idle) }
+    var isPressed by remember { mutableStateOf(false) }
 
-    Column(
+    // ⚡ Animation de zoom rebond
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 1.05f else 1f,
+        animationSpec = tween(durationMillis = 150),
+        label = "scaleAnim"
+    )
+
+    // 💥 Rebond après clic
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            delay(150)
+            isPressed = false
+        }
+    }
+
+    // ✅ Effet après état Loading
+    LaunchedEffect(activationState) {
+        if (activationState == ActivationState.Loading) {
+            delay(2000L)
+            activationState = ActivationState.Success
+            Log.d("Scenario8UI", "✅ Vibration envoyée (Success)")
+            vibrationManager.vibrateByType(vibrationType)
+        }
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
     ) {
-        // 🔸 Titre
-        Text(
-            text = "⏰ Réglage de votre alarme matinale",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // 🔸 Cadran avec message superposé
-        Box(
-            modifier = Modifier
-                .size(260.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.montre),
-                contentDescription = "Cadran",
-                modifier = Modifier.fillMaxSize()
-            )
-
-            // Heure affichée au centre
             Text(
-                text = "${selectedHour.toString().padStart(2, '0')} : ${selectedMinute.toString().padStart(2, '0')}",
-                fontSize = 42.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                text = "Appuie sur le bouton ci-dessous pour continuer.",
+                fontSize = 18.sp,
+                color = Color(0xFF444444), // gris foncé sympa
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // 🟩 Bulle superposée au-dessus du cadran
-            if (messageAlarme.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 8.dp)
-                ) {
-                    Card(
-                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-                        ) {
+            // Ton bouton stylé ici
+            Button(
+                onClick = {
+                    if (activationState == ActivationState.Idle) {
+                        isPressed = true
+                        activationState = ActivationState.Loading
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = when (activationState) {
+                        ActivationState.Idle, ActivationState.Loading -> Color(0xFF029AAF)
+                        ActivationState.Success -> Color(0xFF4CAF50)
+                    },
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(50),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 8.dp,
+                    pressedElevation = 12.dp
+                ),
+                border = BorderStroke(2.dp, Color.White),
+                modifier = Modifier
+                    .graphicsLayer(scaleX = scale, scaleY = scale)
+                    .height(56.dp)
+                    .width(220.dp)
+                    .padding(4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    when (activationState) {
+                        ActivationState.Idle -> {
                             Icon(
-                                imageVector = Icons.Default.Schedule,
-                                contentDescription = "Alarme",
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                painter = painterResource(id = R.drawable.ic_arrow_up),
+                                contentDescription = "Activate",
+                                tint = Color.White
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = messageAlarme,
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            Text("let's go ! 🕊️", color = Color.White)
+                        }
+
+                        ActivationState.Loading -> {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(20.dp)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Waiting...", color = Color.White)
+                        }
+
+                        ActivationState.Success -> {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_check),
+                                contentDescription = "on continue",
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("on continue ✅", color = Color.White)
                         }
                     }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // 🔘 TimePicker
-        Button(onClick = {
-            TimePickerDialog(
-                context,
-                { _, hour, minute ->
-                    selectedHour = hour
-                    selectedMinute = minute
-                },
-                selectedHour,
-                selectedMinute,
-                true
-            ).show()
-        }) {
-            Text("Choisir une heure")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 🔘 Enregistrer
-        Button(onClick = {
-            if (!vibrationPlayed) {
-                vibrationManager.vibrateByType(vibrationType)
-                vibrationPlayed = true
-            }
-
-            val now = Calendar.getInstance()
-            val alarm = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, selectedHour)
-                set(Calendar.MINUTE, selectedMinute)
-                set(Calendar.SECOND, 0)
-                if (before(now)) add(Calendar.DAY_OF_YEAR, 1)
-            }
-
-            val diffMillis = alarm.timeInMillis - now.timeInMillis
-            val diffHours = TimeUnit.MILLISECONDS.toHours(diffMillis)
-            val diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diffMillis) % 60
-
-            messageAlarme = "L’alarme sonnera dans ${diffHours}h ${diffMinutes}min"
-        }) {
-            Text("Enregistrer")
-        }
     }
 }
+
+
+
+
 
 

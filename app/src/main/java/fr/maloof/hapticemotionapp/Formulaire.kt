@@ -8,9 +8,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.maloof.hapticemotionapp.components.CustomButton
 
 
 @Composable
@@ -58,12 +60,27 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
 
         Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Main dominante :", fontWeight = FontWeight.Medium)
+
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(selected = mainDominante == "Droite", onClick = { mainDominante = "Droite" })
+            RadioButton(
+                selected = mainDominante == "Droite",
+                onClick = { mainDominante = "Droite" },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF029AAF) // Ton bleu à toi
+                )
+            )
             Text("Droite", modifier = Modifier.padding(end = 16.dp))
-            RadioButton(selected = mainDominante == "Gauche", onClick = { mainDominante = "Gauche" })
+
+            RadioButton(
+                selected = mainDominante == "Gauche",
+                onClick = { mainDominante = "Gauche" },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Color(0xFF029AAF)
+                )
+            )
             Text("Gauche")
         }
+
 
         Spacer(modifier = Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -86,7 +103,12 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
             onValueChange = { niveauInformatique = it },
             valueRange = 0f..5f,
             steps = 4,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(thumbColor = Color(0xFF029AAF),
+                activeTrackColor = Color(0xFF029AAF)
+
+            )
+
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -103,7 +125,8 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
         OutlinedTextField(value = phoneModelNumber, onValueChange = { phoneModelNumber = it }, label = { Text("Numéro de modèle") }, modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(32.dp))
-        Button(
+        CustomButton(
+            text = "Continuer",
             onClick = {
                 val user = DataModel.User(
                     age = age.toIntOrNull() ?: 0,
@@ -165,9 +188,9 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
                 })
 
             },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Continuer")
-        }
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
+
+

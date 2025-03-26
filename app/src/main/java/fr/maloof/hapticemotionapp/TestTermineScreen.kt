@@ -15,6 +15,7 @@ import nl.dionsegijn.konfetti.core.Position
 import nl.dionsegijn.konfetti.core.Angle
 import nl.dionsegijn.konfetti.core.emitter.*
 import nl.dionsegijn.konfetti.core.models.Size
+import fr.maloof.hapticemotionapp.components.CustomButton
 
 
 
@@ -58,8 +59,12 @@ fun TestTermineScreen(navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // 🎉 Message central
+                Column(
+                    modifier = Modifier.weight(1f), // ✅ Cela empêche de prendre trop de place
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Text(
                         text = "🎉 Test terminé !",
                         fontSize = 28.sp,
@@ -67,13 +72,19 @@ fun TestTermineScreen(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Merci infiniment pour votre participation.",
-                        fontSize = 18.sp,
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "🙏 Un immense merci pour votre participation précieuse.\n" +
+                                "Grâce à vous, l’expérience haptique progresse vers un futur plus intuitif 💡",
+                        fontSize = 20.sp,
+                        lineHeight = 28.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
-                Button(
+                // 🔁 Bouton retour en bas visible
+                CustomButton(
+                    text = "🔁 Revenir à l'accueil",
                     onClick = {
                         navController.navigate("accueil") {
                             popUpTo(0)
@@ -82,9 +93,7 @@ fun TestTermineScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 32.dp)
-                ) {
-                    Text("🔁 Revenir à l'accueil")
-                }
+                )
             }
         }
     }

@@ -8,6 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
@@ -17,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import fr.maloof.hapticemotionapp.ui.theme.HapticEmotionAppTheme
 import fr.maloof.hapticemotionapp.scenarios.ScenarioScreen
+import fr.maloof.hapticemotionapp.components.CustomButton
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,11 +136,24 @@ fun AccueilScreen(onStartClick: () -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Bienvenue dans l'app Haptique", fontSize = 24.sp)
+            Text(
+                text = "Bienvenue dans l'app Haptique 👋",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF029AAF),
+                letterSpacing = 1.sp,
+                lineHeight = 32.sp,
+                modifier = Modifier
+                    .padding(vertical = 24.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = onStartClick) {
-                Text("Commencer")
-            }
+            CustomButton(
+                text ="Commencer",
+                onClick = onStartClick)
+
         }
     }
 }

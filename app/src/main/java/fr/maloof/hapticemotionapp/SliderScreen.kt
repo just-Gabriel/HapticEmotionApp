@@ -6,9 +6,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import fr.maloof.hapticemotionapp.components.CustomButton
+
 
 
 @Composable
@@ -61,7 +64,8 @@ fun SliderScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        CustomButton(
+            text = "Vibration (${vibrationClickCount}/$maxClicks)",
             onClick = {
                 if (vibrationClickCount < maxClicks) {
                     vibrationManager.replayCurrentVibration()
@@ -69,13 +73,9 @@ fun SliderScreen(
                     Log.d("SliderScreen", "📢 Vibration rejouée : type=$selectedVibrationType, nb=$vibrationClickCount")
                 }
             },
-            enabled = vibrationClickCount < maxClicks,
+            isEnabled = vibrationClickCount < maxClicks, // ✅ bien écrit ici
             modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Vibration (${vibrationClickCount}/$maxClicks)")
-        }
-
-
+        )
 
 
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -83,25 +83,40 @@ fun SliderScreen(
             Slider(
                 value = slider1,
                 onValueChange = { slider1 = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF029AAF),
+                    activeTrackColor = Color(0xFF029AAF)
+                )
             )
+
 
             Text("Slider 2: Warning ↔ Confirmation", fontSize = 16.sp)
             Slider(
                 value = slider2,
                 onValueChange = { slider2 = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF029AAF),
+                    activeTrackColor = Color(0xFF029AAF)
+                )
             )
+
 
             Text("Slider 3: Selection ↔ Navigation", fontSize = 16.sp)
             Slider(
                 value = slider3,
                 onValueChange = { slider3 = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF029AAF),
+                    activeTrackColor = Color(0xFF029AAF)
+                )
             )
         }
 
-        Button(
+        CustomButton(
+            text = "Valider",
             onClick = {
                 val scenario = determineScenario(slider1, slider2, slider3)
                 val route = "scenario/$userId/$telephoneId/$selectedVibrationType/$slider1/$slider2/$slider3/$scenario/$mobile/$vibrationClickCount"
@@ -110,9 +125,7 @@ fun SliderScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp)
-        ) {
-            Text("Valider")
-        }
+        )
     }
 }
 
