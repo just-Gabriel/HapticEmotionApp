@@ -21,6 +21,15 @@ fun SliderScreen(
     telephoneId: Int,
     vibrationManager: VibrationManager
 ) {
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+
+    val testCounter by remember {
+        derivedStateOf { savedStateHandle?.get<Int>("testCounter") ?: 1 }
+    }
+
+    val shouldPlayNext by remember {
+        derivedStateOf { savedStateHandle?.get<Boolean>("shouldPlayNext") ?: true }
+    }
 
     var slider1 by remember { mutableStateOf(0.5f) }
     var slider2 by remember { mutableStateOf(0.5f) }
@@ -30,9 +39,17 @@ fun SliderScreen(
     val maxClicks = 10
     var selectedVibrationType by remember { mutableStateOf<Int?>(null) }
 
+    // ✅ Lancer la vibration uniquement si shouldPlayNext est true
+    LaunchedEffect(shouldPlayNext) {
+        if (shouldPlayNext) {
+            vibrationManager.playNextVibration()
+            selectedVibrationType = vibrationManager.currentVibrationId
+            savedStateHandle?.set("shouldPlayNext", false)
+        }
+    }
 
-
-
+    // ✅ Pour le log si besoin
+    Log.d("SliderScreen", "Test n°$testCounter / 60")
 
 
     LaunchedEffect(Unit) {
@@ -42,17 +59,7 @@ fun SliderScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (vibrationManager.isFinished()) {
-            Log.d("SliderScreen", "🎉 Toutes les vibrations ont été jouées. Fin du test.")
-            navController.navigate("test_termine") {
-                popUpTo("sliders/{userId}/{telephoneId}") { inclusive = true }
-            }
-        } else {
-            vibrationManager.playNextVibration()
-            selectedVibrationType = vibrationManager.currentVibrationId
-        }
-    }
+
 
 
     Column(

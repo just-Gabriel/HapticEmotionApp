@@ -36,7 +36,7 @@ fun ScenarioScreen(
     val apiService = RetrofitInstance.api
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
     val testCounter = savedStateHandle?.get<Int>("testCounter") ?: 1
-    val isTestFinished = testCounter >= 5  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
+    val isTestFinished = testCounter >= 60  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
 
 
 

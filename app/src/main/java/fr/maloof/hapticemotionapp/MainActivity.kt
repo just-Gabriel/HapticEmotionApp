@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(route = "testTermine") {
-                        TestTermineScreen(navController = navController) // ✅ maintenant tout fonctionne
+                        TestTermineScreen(navController = navController)
                     }
 
                 }

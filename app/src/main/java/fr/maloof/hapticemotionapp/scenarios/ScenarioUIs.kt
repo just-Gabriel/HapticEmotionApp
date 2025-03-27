@@ -41,6 +41,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.ui.zIndex
 import fr.maloof.hapticemotionapp.components.CustomButton
+import androidx.compose.ui.layout.ContentScale
+
 
 
 
@@ -598,12 +600,10 @@ fun Scenario5UI(
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // 🔸 Image de l’article plus grande
-        Image(
-            painter = painterResource(id = R.drawable.table), // ajoute bien table.png dans drawable
-            contentDescription = "Table",
+        // 💎 Image dans une Card stylée
+        Card(
             modifier = Modifier
-                .size(220.dp)
+                .size(240.dp)
                 .clickable {
                     articleSelected = true
                     if (!vibrationPlayed) {
@@ -611,13 +611,22 @@ fun Scenario5UI(
                         vibrationPlayed = true
                         Log.d("Scenario5UI", "✅ Vibration déclenchée : SUCCESS")
                     }
-                }
-                .padding(8.dp)
-        )
+                },
+            elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.table),
+                contentDescription = "Table",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // ✅ Alerte positive stylée en vert
+        // ✅ Alerte positive stylée
         if (articleSelected) {
             Card(
                 modifier = Modifier
@@ -638,14 +647,15 @@ fun Scenario5UI(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "Super ! Vous avez bénéficié de -50%",
-                        color = Color(0xFF1B5E20), // vert foncé
+                        color = Color(0xFF1B5E20),
                         fontSize = 14.sp
                     )
                 }
             }
-
         }
-}}
+    }
+}
+
 
 //_____________________________________________________________________________________________________________________________________________________________________________
 @Composable
