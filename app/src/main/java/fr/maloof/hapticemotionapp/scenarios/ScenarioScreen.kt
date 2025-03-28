@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,6 +22,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import fr.maloof.hapticemotionapp.components.CustomButton
+
+
 
 
 @Composable
@@ -37,6 +43,7 @@ fun ScenarioScreen(
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
     val testCounter = savedStateHandle?.get<Int>("testCounter") ?: 1
     val isTestFinished = testCounter >= 60  // NOMBRES DE TESTS !!!!!!!!!!!!!!!!!!!!!
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
 
 
@@ -133,13 +140,20 @@ fun ScenarioScreen(
             Text("Vibration adaptée au scénario ?", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+
             ) {
                 CustomButton(
                     text = "Oui",
                     onClick = {
-                    Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
-                    sendExperienceToApi("oui")
+                        if (!isButtonEnabled) return@CustomButton // 🛑 Sécurité supplémentaire
+
+                        isButtonEnabled = false // 🔒 Bloque les clics
+
+                        Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
+                        sendExperienceToApi("oui")
+
 
                     if (isTestFinished) {
                         navController.navigate("testTermine") {
@@ -153,14 +167,23 @@ fun ScenarioScreen(
                         Log.d("ScenarioScreen", "Retour SliderScreen ➜ testCounter = ${testCounter + 1}")
                     }
 
-                    Log.d("ScenarioScreen", "✅ POST vers API : YES")
-                })
+                        Log.d("ScenarioScreen", "✅ POST vers API : YES")
+
+
+                },
+                    isEnabled = isButtonEnabled,
+                    modifier = Modifier.weight(1f)
+                )
 
                 CustomButton(
                     text = "Non",
                     onClick = {
-                    Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
-                    sendExperienceToApi("non")
+                        if (!isButtonEnabled) return@CustomButton
+
+                        isButtonEnabled = false
+
+                        Log.d("ScenarioScreen", "🧮 Test n°$testCounter / 60")
+                        sendExperienceToApi("non")
 
                     if (isTestFinished) {
                         navController.navigate("testTermine") {
@@ -175,7 +198,9 @@ fun ScenarioScreen(
                     }
 
                     Log.d("ScenarioScreen", "✅ POST vers API : NO")
-                })
+                },
+                    isEnabled = isButtonEnabled,
+                    modifier = Modifier.weight(1f))
             }
         }
     }

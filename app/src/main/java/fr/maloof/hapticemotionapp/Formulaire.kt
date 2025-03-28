@@ -38,6 +38,7 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
     var phoneModelNumber by remember { mutableStateOf("SM-S901B") }
 
     val scrollState = rememberScrollState()
+    var isButtonEnabled by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -52,11 +53,36 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Âge") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = sexe, onValueChange = { sexe = it }, label = { Text("Genre") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Nom du superviseur") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = paysResidence, onValueChange = { paysResidence = it }, label = { Text("Pays de résidence") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = profession, onValueChange = { profession = it }, label = { Text("Profession") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = age,
+            onValueChange = { age = it },
+            label = { Text("Âge") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = sexe,
+            onValueChange = { sexe = it },
+            label = { Text("Genre") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Nom du superviseur") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = paysResidence,
+            onValueChange = { paysResidence = it },
+            label = { Text("Pays de résidence") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = profession,
+            onValueChange = { profession = it },
+            label = { Text("Profession") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
         Text(text = "Main dominante :", fontWeight = FontWeight.Medium)
@@ -84,11 +110,15 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
 
         Spacer(modifier = Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = isVibrationTelActive, onCheckedChange = { isVibrationTelActive = it })
+            Checkbox(
+                checked = isVibrationTelActive,
+                onCheckedChange = { isVibrationTelActive = it })
             Text("Vibration téléphone activée")
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = isVibrationClavierActive, onCheckedChange = { isVibrationClavierActive = it })
+            Checkbox(
+                checked = isVibrationClavierActive,
+                onCheckedChange = { isVibrationClavierActive = it })
             Text("Vibration clavier activée")
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -104,7 +134,8 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
             valueRange = 0f..5f,
             steps = 4,
             modifier = Modifier.fillMaxWidth(),
-            colors = SliderDefaults.colors(thumbColor = Color(0xFF029AAF),
+            colors = SliderDefaults.colors(
+                thumbColor = Color(0xFF029AAF),
                 activeTrackColor = Color(0xFF029AAF)
 
             )
@@ -119,15 +150,37 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        OutlinedTextField(value = phoneBrand, onValueChange = { phoneBrand = it }, label = { Text("Système d’exploitation du téléphone") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = phoneModel, onValueChange = { phoneModel = it }, label = { Text("Modèle téléphone") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = phoneVersion, onValueChange = { phoneVersion = it }, label = { Text("Version logicielle") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = phoneModelNumber, onValueChange = { phoneModelNumber = it }, label = { Text("Numéro de modèle") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = phoneBrand,
+            onValueChange = { phoneBrand = it },
+            label = { Text("Système d’exploitation du téléphone") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = phoneModel,
+            onValueChange = { phoneModel = it },
+            label = { Text("Modèle téléphone") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = phoneVersion,
+            onValueChange = { phoneVersion = it },
+            label = { Text("Version logicielle") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = phoneModelNumber,
+            onValueChange = { phoneModelNumber = it },
+            label = { Text("Numéro de modèle") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
         CustomButton(
             text = "Continuer",
             onClick = {
+                isButtonEnabled = false // ❌ On désactive direct
+
                 val user = DataModel.User(
                     age = age.toIntOrNull() ?: 0,
                     sexe = sexe,
@@ -148,49 +201,79 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
                     numeroModele = phoneModelNumber
                 )
 
-                // Envoi API
-                RetrofitInstance.api.createUser(user).enqueue(object : retrofit2.Callback<DataModel.User> {
-                    override fun onResponse(call: retrofit2.Call<DataModel.User>, response: retrofit2.Response<DataModel.User>) {
-                        if (response.isSuccessful) {
-                            val savedUser = response.body()
-                            if (savedUser != null) {
-                                Log.d("RETROFIT", "✅ Utilisateur envoyé avec succès - ID : ${savedUser.id}")
+                RetrofitInstance.api.createUser(user)
+                    .enqueue(object : retrofit2.Callback<DataModel.User> {
+                        override fun onResponse(
+                            call: retrofit2.Call<DataModel.User>,
+                            response: retrofit2.Response<DataModel.User>
+                        ) {
+                            if (response.isSuccessful) {
+                                val savedUser = response.body()
+                                if (savedUser != null) {
+                                    Log.d(
+                                        "RETROFIT",
+                                        "✅ Utilisateur envoyé avec succès - ID : ${savedUser.id}"
+                                    )
 
-                                RetrofitInstance.api.createTelephone(telephone).enqueue(object : retrofit2.Callback<DataModel.Telephone> {
-                                    override fun onResponse(call: retrofit2.Call<DataModel.Telephone>, response: retrofit2.Response<DataModel.Telephone>) {
-                                        if (response.isSuccessful) {
-                                            val savedPhone = response.body()
-                                            if (savedPhone != null) {
-                                                Log.d("RETROFIT", "✅ Téléphone envoyé avec succès - ID : ${savedPhone.id}")
-
-                                                // 👉 ENVOI DES ID UNIQUEMENT à SliderScreen
-                                                onFormSubmit(savedUser.id ?: 0, savedPhone.id ?: 0)
+                                    RetrofitInstance.api.createTelephone(telephone)
+                                        .enqueue(object : retrofit2.Callback<DataModel.Telephone> {
+                                            override fun onResponse(
+                                                call: retrofit2.Call<DataModel.Telephone>,
+                                                response: retrofit2.Response<DataModel.Telephone>
+                                            ) {
+                                                if (response.isSuccessful) {
+                                                    val savedPhone = response.body()
+                                                    if (savedPhone != null) {
+                                                        Log.d(
+                                                            "RETROFIT",
+                                                            "✅ Téléphone envoyé avec succès - ID : ${savedPhone.id}"
+                                                        )
+                                                        onFormSubmit(
+                                                            savedUser.id ?: 0,
+                                                            savedPhone.id ?: 0
+                                                        )
+                                                    }
+                                                } else {
+                                                    Log.e(
+                                                        "RETROFIT",
+                                                        "❌ Erreur Téléphone : ${response.code()}"
+                                                    )
+                                                    isButtonEnabled =
+                                                        true // ❗ On réactive en cas d’erreur
+                                                }
                                             }
-                                        } else {
-                                            Log.e("RETROFIT", "❌ Erreur Téléphone : ${response.code()}")
-                                        }
-                                    }
 
-                                    override fun onFailure(call: retrofit2.Call<DataModel.Telephone>, t: Throwable) {
-                                        Log.e("RETROFIT", "❌ Envoi téléphone échoué : ${t.message}")
-                                    }
-                                })
+                                            override fun onFailure(
+                                                call: retrofit2.Call<DataModel.Telephone>,
+                                                t: Throwable
+                                            ) {
+                                                Log.e(
+                                                    "RETROFIT",
+                                                    "❌ Envoi téléphone échoué : ${t.message}"
+                                                )
+                                                isButtonEnabled =
+                                                    true // ❗ On réactive en cas d’échec
+                                            }
+                                        })
 
+                                }
+                            } else {
+                                Log.e("RETROFIT", "❌ Erreur Utilisateur : ${response.code()}")
+                                isButtonEnabled = true
                             }
-                        } else {
-                            Log.e("RETROFIT", "❌ Erreur Utilisateur : ${response.code()}")
                         }
-                    }
 
-                    override fun onFailure(call: retrofit2.Call<DataModel.User>, t: Throwable) {
-                        Log.e("RETROFIT", "❌ Envoi utilisateur échoué : ${t.message}")
-                    }
-                })
+                        override fun onFailure(call: retrofit2.Call<DataModel.User>, t: Throwable) {
+                            Log.e("RETROFIT", "❌ Envoi utilisateur échoué : ${t.message}")
+                            isButtonEnabled = true
+                        }
+                    })
 
             },
+            isEnabled = isButtonEnabled, // 👈 tu lies ici l'état au bouton
             modifier = Modifier.fillMaxWidth(),
         )
-    }
+        }
 }
 
 

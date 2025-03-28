@@ -68,7 +68,7 @@ class VibrationManager(private val context: Context) {
         currentVibrationCallback = vibration
 
         Log.d("HAPTIC_UTIL", "▶️ Playing vibration ID: $currentVibrationId")
-        vibration.invoke()
+        //vibration.invoke()
         currentIndex++
     }
 

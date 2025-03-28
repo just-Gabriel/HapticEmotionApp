@@ -45,9 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 
 
 
-
-
-
 @Composable
 fun Scenario1UI(
     vibrationManager: VibrationManager,
@@ -81,7 +78,6 @@ fun Scenario1UI(
                     .padding(bottom = 24.dp),
                 textAlign = TextAlign.Center
             )
-
 
             // ✅ Chapeau bleu
             Box(contentAlignment = Alignment.TopStart) {
@@ -665,7 +661,7 @@ fun Scenario6UI(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val jeux = listOf("Puissance 4", "Min", "Echec", "Super Mario")
-    var selectedGame by remember { mutableStateOf("selection") }
+    var selectedGame by remember { mutableStateOf("Sélection") }
     var showPositiveAlert by remember { mutableStateOf(false) }
     var vibrationPlayed by remember { mutableStateOf(false) }
 
@@ -678,35 +674,44 @@ fun Scenario6UI(
     ) {
         // 🔸 Titre
         Text(
-            text = "Sélectionnez un jeu dans la liste déroulante",
-            fontSize = 20.sp,
+            text = "Sélectionnez un jeu dans la liste",
+            fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // 🔸 Dropdown menu
-        Box {
-            Button(onClick = { expanded = true }) {
-                Text(selectedGame)
-            }
+        // 🔸 Card avec menu déroulant
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Jeu sélectionné :", fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                CustomButton(
+                    text = selectedGame,
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                jeux.forEach { jeu ->
-                    DropdownMenuItem(
-                        text = { Text(jeu) },
-                        onClick = {
-                            selectedGame = jeu
-                            expanded = false
-                            showPositiveAlert = true
-                            if (!vibrationPlayed) {
-                                vibrationManager.vibrateByType(vibrationType)
-                                vibrationPlayed = true
-                                Log.d("Scenario6UI", "✅ Vibration déclenchée sur sélection : $jeu")
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    jeux.forEach { jeu ->
+                        DropdownMenuItem(
+                            text = { Text(jeu) },
+                            onClick = {
+                                selectedGame = jeu
+                                expanded = false
+                                showPositiveAlert = true
+                                if (!vibrationPlayed) {
+                                    vibrationManager.vibrateByType(vibrationType)
+                                    vibrationPlayed = true
+                                    Log.d("Scenario6UI", "✅ Vibration déclenchée sur sélection : $jeu")
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -742,6 +747,7 @@ fun Scenario6UI(
         }
     }
 }
+
 
 //_____________________________________________________________________________________________________________________________________________________________________________
 @Composable
@@ -816,9 +822,6 @@ fun Scenario7UI(
                     .size(96.dp)
                     .padding(bottom = 16.dp)
             )
-
-            // 🌿 Bonus : visuel type laurier ou trophée ?
-            // Image(painter = painterResource(id = R.drawable.lauriers), contentDescription = "Success", modifier = Modifier.size(120.dp))
         }
     }
 }

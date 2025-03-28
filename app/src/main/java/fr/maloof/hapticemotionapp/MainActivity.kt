@@ -108,18 +108,10 @@ class MainActivity : ComponentActivity() {
                     }
 
                 }
-
-
                 }
-
-
                     }
                 }
             }
-
-
-
-
 
 
 
