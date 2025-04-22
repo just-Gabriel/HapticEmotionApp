@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.maloof.hapticemotionapp.components.CustomButton
+import fr.maloof.hapticemotionapp.network.ServiceLocator
 
 
 @Composable
@@ -201,7 +202,7 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
                     numeroModele = phoneModelNumber
                 )
 
-                RetrofitInstance.api.createUser(user)
+                ServiceLocator.apiService.createUser(user)
                     .enqueue(object : retrofit2.Callback<DataModel.User> {
                         override fun onResponse(
                             call: retrofit2.Call<DataModel.User>,
@@ -215,7 +216,7 @@ fun FormulaireScreen(onFormSubmit: (Int, Int) -> Unit) {
                                         "✅ Utilisateur envoyé avec succès - ID : ${savedUser.id}"
                                     )
 
-                                    RetrofitInstance.api.createTelephone(telephone)
+                                    ServiceLocator.apiService.createTelephone(telephone)
                                         .enqueue(object : retrofit2.Callback<DataModel.Telephone> {
                                             override fun onResponse(
                                                 call: retrofit2.Call<DataModel.Telephone>,
